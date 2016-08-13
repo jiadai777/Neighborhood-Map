@@ -165,20 +165,20 @@ function setBounds() {
 
 //bound the text content in the search bar and filter the list view simutaneously
 //also change the visibility of markers corresponding the the filtered list
-var viewModel = function() {
-    var self = this;
-
-    search = ko.observable('');
-    self.locations = ko.computed(function() {
-        var filter = self.search().toLowerCase();
-
-        return ko.utils.arrayFilter(locations, function(location) {
-          var visible = location.title.toLowerCase().indexOf(filter) >= 0; // returns true or false
-          location.isVisible = visible;
-          return visible;
-        });
-    }, this);
+var viewModel = {
+    search : ko.observable('')
 };
+
+viewModel.locations = ko.computed(function() {
+    var self = this;
+    var filter = self.search().toLowerCase();
+
+    return ko.utils.arrayFilter(locations, function(location) {
+      var visible = location.title.toLowerCase().indexOf(filter) >= 0; // returns true or false
+      location.isVisible = visible;
+      return visible;
+    });
+}, viewModel);
 
 ko.applyBindings(viewModel);
 
