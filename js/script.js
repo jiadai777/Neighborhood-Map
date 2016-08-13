@@ -176,6 +176,7 @@ viewModel.locations = ko.computed(function() {
     return ko.utils.arrayFilter(locations, function(location) {
       var visible = location.title.toLowerCase().indexOf(filter) >= 0; // returns true or false
       location.isVisible = visible;
+      showMarkers();
       return visible;
     });
 }, viewModel);
