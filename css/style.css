@@ -1,0 +1,133 @@
+#search-box {
+    height: 100%;
+    width: 340px;
+}
+#map {
+    top: 0;
+    height: 100%;
+    left: 0;
+    position: absolute;
+    right: 0;
+    z-index: -1;
+    transition: 0.5s;
+    /* 0.5 second transition effect to slide in the sidenav */
+}
+#arrow-container {
+    background-color: blue;
+    opacity: 0.9;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    margin-top: 20%;
+    transition: 0.5s;
+}
+#marker-list {
+    margin: 0.5px;
+}
+#nav-window {
+    height: 100%;
+    max-height: 100%;
+    width: 0;
+    /* 0 width - change this with JavaScript */
+
+    position: absolute;
+    /* Stay in place */
+
+    z-index: 3;
+    /* Stay on top */
+
+    top: 0;
+    left: 0;
+    background-color: #111;
+    /* Black*/
+
+    overflow-x: hidden;
+    /* Disable horizontal scroll */
+
+    transition: 0.5s;
+}
+/* When you mouse over the navigation links, change their color */
+
+#nav-window a:hover,
+.offcanvas a:focus {
+    color: #f1f1f1;
+}
+#info-button {
+    height: 75px;
+    width: 320px;
+    margin: 0 10px 15px 0;
+    border: solid white 2px;
+    background-color: green;
+    font-size: 16px;
+    color: white;
+    outline: none;
+}
+#info-container {
+    float: right;
+    height: 0px;
+    max-height: 400px;
+    width: 300px;
+    margin-right: 10px;
+    padding-left: 20px;
+    padding-right: 20px;
+    background-color: rgba(255, 255, 255, 0.7);
+    z-index: 3;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    transition: 0.5s;
+}
+.info-links {
+    text-align: left;
+    font-size: 20px;
+    margin: auto;
+}
+.info-links a {
+    text-decoration: none;
+    color: blue;
+}
+.info-links a:hover {
+    color: white;
+    background-color: green;
+    font-weight: bold;
+}
+#close-info {
+    float: right;
+    float: top;
+    border: solid blue 2px;
+    color: white;
+    margin: 0 10px 15px 0;
+    background-color: green;
+}
+strong {
+    font-size: 16px;
+}
+ul {
+    list-style-type: none;
+    padding-left: 0;
+    margin-bottom: 0;
+    text-align: left;
+}
+.list {
+    font-family: Helvetica, sans-serif;
+    padding: 20px 0 15px 15px;
+}
+.list:hover {
+    background-color: #7D7D7D;
+    color: white;
+    font-weight: bold
+}
+.list-links {
+    text-decoration: none;
+    color: #7D7D7D;
+}
+#input {
+    margin: 20px 0 5px 20px;
+    width: 83%;
+    height: 35px;
+    font-size: 17px;
+    font-family: helvetica, sans-serif;
+    color: #9D9D9D;
+    border: none;
+    -webkit-box-shadow: 2px 2px 5px #9D9D9D;
+    outline: none;
+}

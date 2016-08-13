@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+   <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <title>Neighborhood Map Project</title>
+      <link rel="stylesheet" href="css/style.css">
+   </head>
+   <body>
+      <div id="map"></div>
+      <div id="search-box">
+         <div id="nav-window">
+            <h1 style="color: #7D7D7D">What's Fun Near Google?</h1>
+            <input id="input" type="input" placeholder="Search..." data-bind="textInput: search, valueUpdate: 'afterkeydown'" autocomplete="off"></input>
+            <div id="marker-list">
+               <ul data-bind="template: {name: 'location', foreach: locations}">
+               </ul>
+               <script type="text/html" id="location">
+                  <a href="#" class="list-links">
+                      <li data-bind="attr: { id: id }" class="list">
+                          <strong data-bind="text: title"></strong>
+                          <p data-bind="text: streetAddress"></p>
+                          <p data-bind="text: cityAddress"></p>
+                      </li>
+                  </a>
+               </script>
+            </div>
+            <button id="info-button" onclick="openInfo()">More Information about Google</button>
+         </div>
+         <div id="arrow-container" style="cursor:pointer" onclick="openNav()">
+            <img id="arrow" src="img/rightArrow.gif" alt="arrow image" title="Click to open or close navigation menu">
+         </div>
+      </div>
+      <div id="info-container">
+         <button id="close-info" onclick="closeInfo()">XClose</button>
+         <h3 id="nytimes-header">New York Times Articles</h3>
+         <ul data-bind="foreach: nytArticles">
+          <li class="article"><a data-bind="attr: { href=web_url }, text: headline.main"></a></li>
+          <p data-bind="text: article.snippet"></p>
+        </ul>
+      </div>
+   </body>
+   <script type="text/javascript" src="js/knockout-3.4.0.js"></script>
+   <script type="text/javascript" src="js/jQuery.js"></script>
+   <script async type="text/javascript" src="js/script.js"></script>
+   <script async defer
+      src=
+      "https://maps.googleapis.com/maps/api/js?key=AIzaSyDe3OJJNgnsF0W7CjmSy5TJY_6jZGCkbKg&v=3&callback=initMap"></script>
+</html>
