@@ -17,7 +17,7 @@
                </ul>
                <script type="text/html" id="location">
                   <a href="#" class="list-links">
-                      <li data-bind="attr: { id: id }" class="list">
+                      <li data-bind="attr: { id: id }, click: $parent.populateInfoWindow" class="list">
                           <strong data-bind="text: title"></strong>
                           <p data-bind="text: streetAddress"></p>
                           <p data-bind="text: cityAddress"></p>
@@ -34,16 +34,19 @@
       <div id="info-container">
          <button id="close-info" onclick="closeInfo()">XClose</button>
          <h3 id="nytimes-header">New York Times Articles</h3>
-         <ul data-bind="foreach: nytArticles">
-          <li class="article"><a data-bind="attr: { href=web_url }, text: headline.main"></a></li>
-          <p data-bind="text: article.snippet"></p>
+         <ul id="nytLists" data-bind="foreach: nytArticles">
+          <li class="article">
+            <a data-bind="attr: { href: web_url }, text: headline.main"></a>
+            <p data-bind="text: snippet"></p>
+          </li>
         </ul>
       </div>
    </body>
+   <script>function googleError(){$('#map').html('<strong>Google map cannot be loaded.</strong>')}</script>
    <script type="text/javascript" src="js/knockout-3.4.0.js"></script>
    <script type="text/javascript" src="js/jQuery.js"></script>
-   <script async type="text/javascript" src="js/script.js"></script>
+   <script type="text/javascript" src="js/script.js"></script>
    <script async defer
       src=
-      "https://maps.googleapis.com/maps/api/js?key=AIzaSyDe3OJJNgnsF0W7CjmSy5TJY_6jZGCkbKg&v=3&callback=initMap"></script>
+      "https://maps.googleapis.com/maps/api/js?key=AIzaSyDe3OJJNgnsF0W7CjmSy5TJY_6jZGCkbKg&v=3&callback=initMap" onerror="googleError()"></script>
 </html>

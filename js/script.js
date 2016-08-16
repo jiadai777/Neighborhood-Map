@@ -1,6 +1,7 @@
 //set map, markers array, and locations information accessible in global scope
 var map;
-var markers = [];
+var infoWindow;
+var currentMarker;
 var locations = [{
     title: "Google Headquarter",
     location: {
@@ -66,11 +67,12 @@ function initMap() {
         zoom: 13,
         mapTypeControl: false
     };
-
+    //set up map and marker infowindows
     map = new google.maps.Map(document.getElementById('map'), mapAttr);
+    infoWindow = new google.maps.InfoWindow();
 
-    createMarkers(locations);
-    showMarkers();
+    ko.applyBindings(new viewModel());
+
 }
 
 function createMarkers(locations) {
@@ -92,33 +94,25 @@ function createMarkers(locations) {
             id: 'nav' + i,
             isVisible: true
         });
-        //push the marker to the array of markers.
-        markers.push(marker);
+        locations[i].marker = marker;
 
-        locations[i].holdMarker = marker;
         //Create an onclick event to open an infowindow for at each marker.
         marker.addListener('click', function() {
-            populateInfoWindow(this, infoWindow);
+            populateInfoWindow(this);
         });
-        //Create click event to open an infowindow when a list in the nav is clicked.
-        var locationID = $('#nav' + i);
-        locationID.click((function(marker, i) {
-            return function() {
-                populateInfoWindow(marker, infoWindow);
-            };
-        })(marker, i));
     }
 }
 
-function populateInfoWindow(marker, infoWindow) {
+function populateInfoWindow(marker) {
+
     //Check to make sure the infoWindow is not already opened on this marker.
     if (infoWindow.marker != marker) {
         infoWindow.marker = marker;
-
+        currentMarker = marker;
         //make a marker bouncing for 2 seconds when clicked
         marker.setAnimation(google.maps.Animation.BOUNCE);
         setTimeout(function() {
-          marker.setAnimation(null);
+            marker.setAnimation(null);
         }, 2400);
         //create the contents in an infowindow
         var infoContent = '<br><hr style="margin-bottom: 5px"><strong>' +
@@ -146,9 +140,9 @@ function showMarkers() {
         //check if markers should be shown based on visibility change from the
         //search filter results
         if (locations[i].isVisible === true) {
-            markers[i].setMap(map);
+            locations[i].marker.setMap(map);
         } else {
-            markers[i].setMap(null);
+            locations[i].marker.setMap(null);
         }
     }
     setBounds();
@@ -157,31 +151,76 @@ function showMarkers() {
 //set boundaries of google map based on markers positions
 function setBounds() {
     var bounds = new google.maps.LatLngBounds();
-    for (var i = 0; i < markers.length; i++) {
-        bounds.extend(markers[i].position);
+    for (var i = 0; i < locations.length; i++) {
+        bounds.extend(locations[i].marker.position);
         map.fitBounds(bounds);
     }
 }
 
 //bound the text content in the search bar and filter the list view simutaneously
 //also change the visibility of markers corresponding the the filtered list
-var viewModel = {
-    search : ko.observable('')
-};
-
-viewModel.locations = ko.computed(function() {
+var viewModel = function() {
     var self = this;
-    var filter = self.search().toLowerCase();
+    self.search = ko.observable('');
+    createMarkers(locations);
+    self.currentMarker = currentMarker;
 
-    return ko.utils.arrayFilter(locations, function(location) {
-      var visible = location.title.toLowerCase().indexOf(filter) >= 0; // returns true or false
-      location.isVisible = visible;
-      showMarkers();
-      return visible;
-    });
-}, viewModel);
+    self.populateInfoWindow = function(place) {
+        var marker = place.marker;
+        if (infoWindow.marker != marker) {
+            infoWindow.marker = marker;
+            lodaData(marker);
+            //make a marker bouncing for 2 seconds when clicked
+            marker.setAnimation(google.maps.Animation.BOUNCE);
+            setTimeout(function() {
+                marker.setAnimation(null);
+            }, 2400);
+            //create the contents in an infowindow
+            var infoContent = '<br><hr style="margin-bottom: 5px"><strong>' +
+                marker.title + '</strong><br><p>' +
+                marker.streetAddress + '<br>' +
+                marker.cityAddress + '<br></p><a class="web-links" href="http://' + marker.url +
+                '" target="_blank">' + marker.url + '</a>';
 
-ko.applyBindings(viewModel);
+            infoWindow.setContent(infoContent);
+
+            infoWindow.open(map, marker);
+            //zoom in the marker when it is clicked and infowindow is open
+            map.setZoom(16);
+            map.setCenter(marker.position);
+            infoWindow.addListener('closeclick', function() {
+                infoWindow.marker = null;
+            });
+        }
+    };
+    self.locations = ko.computed(function() {
+        var filter = self.search().toLowerCase();
+
+        return ko.utils.arrayFilter(locations, function(location) {
+            var visible = location.title.toLowerCase().indexOf(filter) >= 0; // returns true or false
+            location.isVisible = visible;
+            showMarkers();
+            return visible;
+        });
+    }, this);
+
+    self.loadData = function(marker) {
+        self.nytArticles = ko.observableArray([]);
+        self.marker = marker;
+        //New York Times json request
+        var nytimesUrl = 'http://api.nytimes.com/svc/search/v2/articlesearch.json?q=' + self.marker.title.toLowerCase() + '&sort=newest&api-key=cc0410895ee04c63874f1fca9596939d'
+        $.getJSON(nytimesUrl, function(data) {
+
+            var articles = data.response.docs;
+            for (var i = 0; i < articles.length; i++) {
+                self.nytArticles.push(articles[i]);
+            };
+        }).fail(function(e) {
+            $('#nytLists').html('<p>New York Times Articles Could Not Be Loaded</p>');
+        });
+        return false;
+    }
+}
 
 //open navigation window by setting its width to 340px
 //also change the arrow direction and it becomes a close button
@@ -212,25 +251,3 @@ function closeNav() {
 function closeInfo() {
     document.getElementById("info-container").style.height = "0px";
 }
-
-var nytArticles = ko.observableArray([]);
-//Load information from Wikipedia and New York Times about Google
-function loadData () {
-
-
-
-    //New York Times json request
-    var nytimesUrl = 'http://api.nytimes.com/svc/search/v2/articlesearch.json?q=google&sort=newest&api-key=cc0410895ee04c63874f1fca9596939d'
-    $.getJSON(nytimesUrl, function(data) {
-
-        articles = data.response.docs;
-
-        for (var i = 0; i < articles.length; i++) {
-            nytArticles.push(articles[i]);
-        };
-    }).fail(function(e) {
-        $nytHeaderElem.text('New York Times Articles Could Not Be Loaded');
-    });
-
-    return false;
-};

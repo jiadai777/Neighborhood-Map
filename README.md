@@ -17,8 +17,7 @@ There is a search bar at the top, where you can type anything to filter the list
 to find. The markers on the map will disappear/appear based on the search result too. All filtering happen
 in real time when the text is changed in the search bar.
 
-At the bottom of the navigation window, there is a green button you can click to get Wikipedia information
-and New York Times articles about Google. When clicked, an information window will slide down on the right
+At the bottom of the navigation window, there is a green button you can click to get New York Times articles about Google. When clicked, an information window will slide down on the right
 side of the screen. To close it, click the green button on the top right corner of the window.
 
 ## References and Inspiration From
