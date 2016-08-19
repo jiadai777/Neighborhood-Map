@@ -1,7 +1,6 @@
 //set map, markers array, and locations information accessible in global scope
 var map;
 var infoWindow;
-var currentMarker;
 var locations = [{
     title: "Google Headquarter",
     location: {
@@ -163,13 +162,12 @@ var viewModel = function() {
     var self = this;
     self.search = ko.observable('');
     createMarkers(locations);
-    self.currentMarker = currentMarker;
+    self.nytArticles = ko.observableArray([]);
 
     self.populateInfoWindow = function(place) {
         var marker = place.marker;
         if (infoWindow.marker != marker) {
             infoWindow.marker = marker;
-            lodaData(marker);
             //make a marker bouncing for 2 seconds when clicked
             marker.setAnimation(google.maps.Animation.BOUNCE);
             setTimeout(function() {
@@ -191,8 +189,24 @@ var viewModel = function() {
             infoWindow.addListener('closeclick', function() {
                 infoWindow.marker = null;
             });
+
+            var titleStr = marker.title;
+            //New York Times json request
+            var nytimesUrl = 'http://api.nytimes.com/svc/search/v2/articlesearch.json?q=' + titleStr + '&sort=newest&api-key=cc0410895ee04c63874f1fca9596939d';
+            $.getJSON(nytimesUrl, function(data) {
+                //clear off contents of previously selected marker
+                $('#nytLists').html("");
+                //add article contents for current selected marker
+                var articles = data.response.docs;
+                for (var i = 0; i < articles.length; i++) {
+                    self.nytArticles.push(articles[i]);
+                }
+            }).fail(function(e) {
+                $('#nytLists').html('<p>New York Times Articles Could Not Be Loaded</p>');
+            });
         }
     };
+
     self.locations = ko.computed(function() {
         var filter = self.search().toLowerCase();
 
@@ -203,51 +217,35 @@ var viewModel = function() {
             return visible;
         });
     }, this);
-
-    self.loadData = function(marker) {
-        self.nytArticles = ko.observableArray([]);
-        self.marker = marker;
-        //New York Times json request
-        var nytimesUrl = 'http://api.nytimes.com/svc/search/v2/articlesearch.json?q=' + self.marker.title.toLowerCase() + '&sort=newest&api-key=cc0410895ee04c63874f1fca9596939d'
-        $.getJSON(nytimesUrl, function(data) {
-
-            var articles = data.response.docs;
-            for (var i = 0; i < articles.length; i++) {
-                self.nytArticles.push(articles[i]);
-            };
-        }).fail(function(e) {
-            $('#nytLists').html('<p>New York Times Articles Could Not Be Loaded</p>');
-        });
-        return false;
-    }
-}
+};
 
 //open navigation window by setting its width to 340px
 //also change the arrow direction and it becomes a close button
 function openNav() {
-    document.getElementById("nav-window").style.width = "340px";
-    document.getElementById("arrow-container").style.marginLeft = "340px";
-    document.getElementById("map").style.left = "340px";
-    $("#arrow").attr("src", "img/leftArrow.gif");
-    $("#arrow-container").attr("onclick", "closeNav()");
-}
-
-//open the wiki and NY Times window by setting its height to 400 px
-function openInfo() {
-    document.getElementById("info-container").style.height = "400px";
-}
+  document.getElementById("nav-window").style.width = "340px";
+  document.getElementById("arrow-container").style.marginLeft = "340px";
+  document.getElementById("map").style.left = "340px";
+  $("#arrow").attr("src", "img/leftArrow.gif");
+  $("#arrow-container").attr("onclick", "closeNav()");
+};
 
 //close navigation window by setting its width to 0
 //also change arrow direction and it becomes a open nav button
-function closeNav() {
+closeNav = function() {
     document.getElementById("nav-window").style.width = "0";
     document.getElementById("arrow-container").style.marginLeft = "0";
     document.getElementById("map").style.left = "0px";
     $("#arrow").attr("src", "img/rightArrow.gif");
     $("#arrow-container").attr("onclick", "openNav()");
-}
+};
+
+//open the wiki and NY Times window by setting its height to 400 px
+function openInfo() {
+    document.getElementById("info-container").style.height = "400px";
+};
+
 
 //close the wiki and NY Times window by setting its height to 0 px
 function closeInfo() {
     document.getElementById("info-container").style.height = "0px";
-}
+};
